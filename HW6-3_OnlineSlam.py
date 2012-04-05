@@ -597,40 +597,39 @@ def online_slam(data, N, num_landmarks, motion_noise, measurement_noise):
 
             # update the information maxtrix/vector based on the measurement
             for b in range(2):
-                Omega.value[n+b][n+b] +=  1.0 / measurement_noise
+                Omega.value[b][b] +=  1.0 / measurement_noise
                 Omega.value[m+b][m+b] +=  1.0 / measurement_noise
-                Omega.value[n+b][m+b] += -1.0 / measurement_noise
-                Omega.value[m+b][n+b] += -1.0 / measurement_noise
-                Xi.value[n+b][0]      += -measurement[i][1+b] / measurement_noise
+                Omega.value[b][m+b] += -1.0 / measurement_noise
+                Omega.value[m+b][b] += -1.0 / measurement_noise
+                Xi.value[b][0]      += -measurement[i][1+b] / measurement_noise
                 Xi.value[m+b][0]      +=  measurement[i][1+b] / measurement_noise
 
-        Omega = Omega.expand(8, 8, [0, 3, 4, 5, 6, 7], [0, 3, 4, 5, 6, 7])
-        Xi = Xi.expand(8, 1, [0, 1, 4, 5, 6, 7], [0])
+        # expand the information matrix and vector by one new position.
 
-        # TODO : I don't understand what is further
-
-        # TODO: Perhaps take() and perform provoded equations
-
-        prime = Omega.take([2, 3, 4, 5, 6, 7], [2, 3, 4, 5, 6, 7])
-        Bm = Omega.take([0, 1], [0, 1])
-
-        # TODO: Bug
-
-        Bmi = Bm#.inverse()
-        Am = Omega.take([0, 1], [2, 3, 4, 5, 6, 7])
-        Amt = Am.transpose()
-
-        # TODO: I Give Up
-        Omega = prime - Amt * Bmi * Am
+        r = range(4, dim + 2)
+        list = [0, 1] + r
+        Omega = Omega.expand(dim + 2, dim + 2, list, list)
+        Xi = Xi.expand(dim + 2, 1, list, [0])
 
         # update the information maxtrix/vector based on the robot motion
+
         for b in range(4):
-            Omega.value[n+b][n+b] +=  1.0 / motion_noise
+            Omega.value[b][b] += 1 / motion_noise
+
         for b in range(2):
-            Omega.value[n+b  ][n+b+2] += -1.0 / motion_noise
-            Omega.value[n+b+2][n+b  ] += -1.0 / motion_noise
-            Xi.value[n+b  ][0]        += -motion[b] / motion_noise
-            Xi.value[n+b+2][0]        +=  motion[b] / motion_noise
+            Omega.value[b][b+2] += -1.0 / motion_noise
+            Omega.value[b+2][b] += -1.0 / motion_noise
+            Xi.value[b][0] += -motion[b] / motion_noise
+            Xi.value[b+2][0] += motion[b] / motion_noise
+
+        # new factor out of previous pose
+        newlist = range(2, len(Omega.value))
+        a = Omega.take([0,1], newlist)
+        b = Omega.take([0,1])
+        c = Xi.take([0,1], [0])
+
+        Omega = Omega.take(newlist) - a.transpose() * b.inverse() * a
+        Xi = Xi.take(newlist, [0]) - a.transpose() * b.inverse() * c
 
     # compute best estimate
     mu = Omega.inverse() * Xi
@@ -801,7 +800,7 @@ answer_omega2      = matrix([[0.22871751620895048, 0.0, -0.11351536555795691, 0.
     [-0.11351536555795691, 0.0, -0.46327947920510265, 0.0, 0.7867205207948973, 0.0],
     [0.0, -0.11351536555795691, 0.0, -0.46327947920510265, 0.0, 0.7867205207948973]])
 
-#result = online_slam(testdata2, 6, 2, 3.0, 4.0)
-#solution_check(result, answer_mu2, answer_omega2)
+result = online_slam(testdata2, 6, 2, 3.0, 4.0)
+solution_check(result, answer_mu2, answer_omega2)
 
 
