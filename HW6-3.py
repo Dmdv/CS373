@@ -623,8 +623,6 @@ def online_slam(data, N, num_landmarks, motion_noise, measurement_noise):
         # TODO: I Give Up
         Omega = prime - Amt * Bmi * Am
 
-
-
         # update the information maxtrix/vector based on the robot motion
         for b in range(4):
             Omega.value[n+b][n+b] +=  1.0 / motion_noise
