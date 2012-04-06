@@ -53,9 +53,9 @@ grid = [[0, 0, 0, 0],
 goal = [0, len(grid[0])-1] # Goal is in top right corner
 
 delta = [[-1, 0 ], # go up
-    [ 0, -1], # go left
-    [ 1, 0 ], # go down
-    [ 0, 1 ]] # go right
+        [ 0, -1], # go left
+        [ 1, 0 ], # go down
+        [ 0, 1 ]] # go right
 
 delta_name = ['^', '<', 'v', '>'] # Use these when creating your policy grid.
 
@@ -92,11 +92,14 @@ def stochastic_value():
                         change = True
 
                 elif grid[x][y] == 0:
+
+                    #iteration by action.
                     for a in range(len(delta)):
                         x2 = x + delta[a][0]
                         y2 = y + delta[a][1]
 
-                        if 0 <= x2 < len(grid) and y2 >= 0 and y2 < len(grid[0]) and grid[x2][y2] == 0:
+                        if len(grid) > x2 >= 0 <= y2 < len(grid[0]) and grid[x2][y2] == 0:
+
                             v2 = value[x2][y2] * success_prob + cost_step
                             if x2 - 1 >= 0:
                                 v2 = v2 + failure_prob * value[x2-1][y2]
@@ -114,6 +117,12 @@ def stochastic_value():
 
     print("Value:")
     for row in value:
+        print(row)
+
+    print()
+
+    print("Policy:")
+    for row in policy:
         print(row)
 
     return value, policy
