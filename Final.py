@@ -66,6 +66,15 @@ __author__ = 'Dyachkov'
 
 import random
 
+forward = [[-1,  0], # go up
+        [ 0, -1], # go left
+        [ 1,  0], # go down
+        [ 0,  1]] # do right
+
+# the cost field has 3 values: right turn, no turn, left turn
+action = [-1, 0, 1]
+action_name = ['R', '#', 'L']
+
 # ------------------------------------------
 # build_road - Makes a road according to your specified length and
 # lane_speeds. lane_speeds is a list of speeds for the lanes (listed
@@ -81,7 +90,7 @@ def build_road(length, lane_speeds, print_flag = False, obstacles = False, obsta
                     road[x][y] = 0
     if print_flag:
         for lane in road:
-            print('[' + ', '.join('%5.3f' % speed for speed in lane) + ']')
+            print("[%s]" % ', '.join('%5.3f' % speed for speed in lane))
     return road
 
 # ------------------------------------------
@@ -89,11 +98,60 @@ def build_road(length, lane_speeds, print_flag = False, obstacles = False, obsta
 # lane_change_cost.
 #
 def plan(road, lane_change_cost, init, goal): # Don't change the name of this function!
-    #
-    #
-    # Insert Code Here
-    #
-    #
+
+    cost = [lane_change_cost, 1, lane_change_cost]
+
+    o2 = 0.0
+    value = [[[999 for col in row ] for row in road] for f in forward]
+    policy = [[[' ' for col in row ] for row in road] for f in forward]
+    policy2D = [[' ' for row in range(len(road[0]))] for col in range(len(road))]
+
+    change = True
+    while change:
+        change = False
+        for x in range(len(road)):
+            for y in range(len(road[0])):
+                for orientation in range(4):
+                    if goal[0] == x and goal[1] == y:
+                        if value[orientation][x][y] > 0:
+                            value[orientation][x][y] = 0
+                            policy[orientation][x][y] = '*'
+                            change = True
+
+                    elif road[x][y]:
+
+                        # calculate 3 ways to propagate value
+                        for i in range(len(action)):
+
+                            o2 = (orientation + action[i]) % 4
+                            x2 = x + forward[o2][0]
+                            y2 = y + forward[o2][1]
+
+                            # if inside the lane
+                            if len(road) > x2 >= 0 <= y2 < len(road[0]) and road[x2][y2] != 0:
+
+                                v2 = value[o2][x2][y2] + cost[i]
+
+                                if v2 < value[orientation][x][y]:
+                                    change = True
+                                    value[orientation][x][y] = v2
+                                    policy[orientation][x][y] = action_name[i]
+    x = init[0]
+    y = init[1]
+    orientation = 0 #init[2]
+    policy2D[x][y] = policy[orientation][x][y]
+    while policy[orientation][x][y] != '*':
+        if policy[orientation][x][y] == '#':
+            o2 = orientation
+        elif policy[orientation][x][y] == 'R':
+            o2 = (orientation - 1) % 4
+        elif policy[orientation][x][y] == 'L':
+            o2 = (orientation + 1) % 4
+        x = x + forward[o2][0]
+        y = y + forward[o2][1]
+        orientation = o2
+        policy2D[x][y] = policy[orientation][x][y]
+
     return cost
 
 ################# TESTING ##################
@@ -134,6 +192,8 @@ test_init1 = [len(test_road1) - 1, 0]
 test_goal1 = [len(test_road1) - 1, len(test_road1[0]) - 1]
 true_cost1 = 1.244
 
+test = plan(test_road1, lane_change_cost1, test_init1, test_goal1)
+
 # Test Case 2 (more realistic road)
 test_road2 = build_road(14, [80, 60, 40, 20])
 lane_change_cost2 = 1.0 / 100.0
@@ -143,8 +203,9 @@ true_cost2 = 0.293333333333
 
 # Test Case 3 (Obstacles included)
 test_road3 = [[50, 50, 50, 50, 50, 40, 0, 40, 50, 50, 50, 50, 50, 50, 50], # left lane: 50 km/h
-    [40, 40, 40, 40, 40, 30, 20, 30, 40, 40, 40, 40, 40, 40, 40],
-    [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]] # right lane: 30 km/h
+            [40, 40, 40, 40, 40, 30, 20, 30, 40, 40, 40, 40, 40, 40, 40],
+            [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]] # right lane: 30 km/h
+
 lane_change_cost3 = 1.0 / 500.0
 test_init3 = [len(test_road3) - 1, 0]
 test_goal3 = [len(test_road3) - 1, len(test_road3[0]) - 1]
@@ -152,13 +213,13 @@ true_cost3 = 0.355333333333
 
 # Test Case 4 (Slalom)
 test_road4 = [[50, 50, 50, 50, 50, 40,  0, 40, 50, 50,  0, 50, 50, 50, 50], # left lane: 50 km/h
-    [40, 40, 40, 40,  0, 30, 20, 30,  0, 40, 40, 40, 40, 40, 40],
-    [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]] # right lane: 30 km/h
+            [40, 40, 40, 40,  0, 30, 20, 30,  0, 40, 40, 40, 40, 40, 40],
+            [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]] # right lane: 30 km/h
+
 lane_change_cost4 = 1.0 / 65.0
 test_init4 = [len(test_road4) - 1, 0]
 test_goal4 = [len(test_road4) - 1, len(test_road4[0]) - 1]
 true_cost4 = 0.450641025641
-
 
 testing_suite = [[test_road1, test_road2, test_road3, test_road4],
     [lane_change_cost1, lane_change_cost2, lane_change_cost3, lane_change_cost4],
@@ -166,7 +227,7 @@ testing_suite = [[test_road1, test_road2, test_road3, test_road4],
     [test_goal1, test_goal2, test_goal3, test_goal4],
     [true_cost1, true_cost2, true_cost3, true_cost4]]
 
-#solution_check(testing_suite) #UNCOMMENT THIS LINE TO TEST YOUR CODE
+solution_check(testing_suite) #UNCOMMENT THIS LINE TO TEST YOUR CODE
 
 
 
