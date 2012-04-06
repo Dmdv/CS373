@@ -56,14 +56,22 @@ forward = [[-1,  0], # go up
 forward_name = ['up', 'left', 'down', 'right']
 
 # the cost field has 3 values: right turn, no turn, left turn
-action = [-1, 0, 1]
-action_name = ['R', '#', 'L']
+action = [-1, 0, 1, 1]
+action_name = ['R', '#', 'L', 'D']
 
 # ----------------------------------------
 # modify code below
 # ----------------------------------------
 
 def optimum_policy2D():
+
+    for orientation in range(4):
+        for i in range(len(action)): # iteration by action
+            o2 = (orientation + action[i]) % 4
+            x2 = forward[o2][0]
+            y2 = forward[o2][1]
+
+    global o2
     value = [[[999 for col in row ] for row in grid] for f in forward]
     policy = [[[' ' for col in row ] for row in grid] for f in forward]
     policy2D = [[' ' for row in range(len(grid[0]))] for col in range(len(grid))]
@@ -79,14 +87,20 @@ def optimum_policy2D():
                             value[orientation][x][y] = 0
                             policy[orientation][x][y] = '*'
                             change = True
-                    elif grid[x][y] == 0:
+
+                    elif not grid[x][y]:
 
                         # calculate 3 ways to propagate value
-                        for i in range(3):
+                        for i in range(len(action)): # iteration by action
+                            # to keep orientation within 3.
+                            # left + up = right
                             o2 = (orientation + action[i]) % 4
                             x2 = x + forward[o2][0]
                             y2 = y + forward[o2][1]
-                            if x2 >= 0 and x2 < len(grid) and y2 >= 0 and y2 < len(grid[0]) and grid[x2][y2] == 0:
+
+                            #print ("o2 = ", o2, "x2 = ", x2, "y2 = ", y2)
+
+                            if len(grid) > x2 >= 0 <= y2 < len(grid[0]) and grid[x2][y2] == 0:
                                 v2 = value[o2][x2][y2] + cost[i]
                                 if v2 < value[orientation][x][y]:
                                     change = True
