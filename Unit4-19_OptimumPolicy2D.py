@@ -33,6 +33,15 @@ goal = [2, 0] # final position
 init = [4, 3, 0] # first 2 elements are coordinates, third is direction
 cost = [2, 1, 20] # the cost field has 3 values: right turn, no turn, left turn
 
+grid1 = [[0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0]]
+
+goal1 = [1, 5] # final position
+init1 = [1, 0, 3] # first 2 elements are coordinates, third is direction
+cost1 = [0.1, 1, 1] # the cost field has 3 values: right turn, no turn, left turn
+
+
 # EXAMPLE OUTPUT:
 # calling optimum_policy2D() should return the array
 #
@@ -49,15 +58,15 @@ cost = [2, 1, 20] # the cost field has 3 values: right turn, no turn, left turn
 # a left turn. Decreasing is is a right turn.
 
 forward = [[-1,  0], # go up
-        [ 0, -1], # go left
-        [ 1,  0], # go down
-        [ 0,  1]] # do right
+        [0, -1], # go left
+        [1,  0], # go down
+        [0,  1]] # do right
 
 forward_name = ['up', 'left', 'down', 'right']
 
 # the cost field has 3 values: right turn, no turn, left turn
-action = [-1, 0, 1, 1]
-action_name = ['R', '#', 'L', 'D']
+action = [-1, 0, 1]
+action_name = ['R', '#', 'L']
 
 # ----------------------------------------
 # modify code below
@@ -65,11 +74,12 @@ action_name = ['R', '#', 'L', 'D']
 
 def optimum_policy2D():
 
-    for orientation in range(4):
-        for i in range(len(action)): # iteration by action
-            o2 = (orientation + action[i]) % 4
-            x2 = forward[o2][0]
-            y2 = forward[o2][1]
+    #for orientation in range(4):
+    #    for i in range(len(action)): # iteration by action
+    #        o2 = (orientation + action[i]) % 4
+    #        x2 = forward[o2][0]
+    #        y2 = forward[o2][1]
+    #        #print (forward_name[o2], forward[o2], action_name[i])
 
     global o2
     value = [[[999 for col in row ] for row in grid] for f in forward]
@@ -126,3 +136,8 @@ def optimum_policy2D():
 
 for row in optimum_policy2D():
     print(row)
+
+# You can move through the list of forward actions.
+# If your direction is forward[i], forward[i-1]
+# is the direction of a left turn and forward[i+1]
+# is the direction of the right turn. Of course you should make this cyclic using % len(forward).

@@ -6,6 +6,11 @@ grid = [[1, 1, 1, 0, 0, 0],
     [1, 1, 1, 0, 1, 1],
     [1, 1, 1, 0, 1, 1]]
 
+grid2 = [[0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0]]
+
+
 goal = [2, 0] # final position
 init = [4, 3, 0] # first 2 elements are coordinates, third is direction
 cost = [2, 1, 20] # the cost field has 3 values: right turn, no turn, left turn

@@ -13,29 +13,19 @@
 # path to the position specified in `goal'; where
 # the costs for each motion are as defined in `cost'.
 
-#The way it works is by keeping track of all the paths using a priority queue, which is sorted by the path's cost.
-# A path is maintained as a linked list of cells, each cell containing its position,
-# the cost of the path from the initial position to that cell, the previous cell in the path,
-# and the action that was needed to move from the previous cell to the current one.
-# Maintaining a path is a simple as keeping track of the head of the path, represented by a cell.
-#The algorithm always expands the path with the lowest cost, so there's no unnecessary work being performed.
-
 # EXAMPLE INPUT:
 
 # grid format:
 #     0 = navigable space
 #     1 = occupied space
 grid = [[1, 1, 1, 0, 0, 0],
-        [1, 1, 1, 0, 1, 0],
-        [0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 0, 1, 1],
-        [1, 1, 1, 0, 1, 1]]
-
+    [1, 1, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 1, 1],
+    [1, 1, 1, 0, 1, 1]]
 goal = [2, 0] # final position
 init = [4, 3, 0] # first 2 elements are coordinates, third is direction
 cost = [2, 1, 20] # the cost field has 3 values: right turn, no turn, left turn
-action = [-1, 0, 1]
-action_name = ['R', '#', 'L']
 
 # EXAMPLE OUTPUT:
 # calling optimum_policy2D() should return the array
@@ -47,6 +37,7 @@ action_name = ['R', '#', 'L']
 #  [' ', ' ', ' ', '#', ' ', ' ']]
 #
 # ----------
+
 
 # there are four motion directions: up/left/down/right
 # increasing the index in this array corresponds to
@@ -193,4 +184,4 @@ def optimum_policy2D():
 
 policy = optimum_policy2D()
 for r in policy:
-    print (r)
+    print(r)
