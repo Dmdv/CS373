@@ -55,6 +55,7 @@ forward_name = ['up', 'left', 'down', 'right']
 action = [-1, 0, 1]
 action_name = ['R', '#', 'L']
 
+
 # ----------------------------------------
 # modify code below
 # ----------------------------------------
