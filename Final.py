@@ -218,6 +218,7 @@ test_init1 = [len(test_road1) - 1, 0]
 test_goal1 = [len(test_road1) - 1, len(test_road1[0]) - 1]
 true_cost1 = 1.244
 
+
 test = plan(test_road1, lane_change_cost1, test_init1, test_goal1)
 
 # Test Case 2 (more realistic road)
